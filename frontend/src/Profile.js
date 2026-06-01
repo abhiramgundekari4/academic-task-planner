@@ -468,7 +468,7 @@ function Profile() {
           <div className="flex-1 w-full text-center md:text-left space-y-4">
             <div>
               <h2 className="text-2xl font-bold text-gray-800">{student.name || "Student Name"}</h2>
-              <p className="text-sm text-blue-500 font-medium">{student.email || "student@university.edu"}</p>
+              <p className="text-sm text-blue-500 font-medium">{student.email || ""}</p>
             </div>
 
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3 pt-2 text-xs font-semibold">

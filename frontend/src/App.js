@@ -33,7 +33,7 @@ function App() {
     course: "",
     year: "",
     branch: "",
-    attendance: 0
+
   });
 
   // class schedule state values
@@ -99,7 +99,7 @@ function App() {
             course: "",
             year: "",
             branch: "",
-            attendance: 0
+          
           };
           setStudent(defaultProfile);
           localStorage.setItem("smart_task_manager_local_profile", JSON.stringify(defaultProfile));
@@ -133,8 +133,8 @@ function App() {
           setFaculties(JSON.parse(stored));
         } else {
           const defaultFaculties = [
-            { _id: "f1", name: "Dr. K. Srinivas", subject: "DBMS", email: "srinivas.k@university.edu", cabin: "Block A - 304" },
-            { _id: "f2", name: "Dr. A. Reddy", subject: "Machine Learning", email: "reddy.a@university.edu", cabin: "Block C - 102" }
+            { _id: "f1", name: "Dr. K. Srinivas", subject: "DBMS", email: "srinivas.k@gmail.com", cabin: "Block A - 304" },
+            { _id: "f2", name: "Dr. A. Reddy", subject: "Machine Learning", email: "reddy.a@gmail.com", cabin: "Block C - 102" }
           ];
           setFaculties(defaultFaculties);
           localStorage.setItem("smart_task_manager_local_faculties", JSON.stringify(defaultFaculties));
@@ -179,7 +179,7 @@ function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token]);
 
-  // Load schedule from localStorage or set SR University defaults
+  // Load schedule from localStorage or set timetable defaults
   useEffect(() => {
     try {
       const stored = localStorage.getItem("smart_task_manager_schedule");
@@ -474,7 +474,7 @@ function App() {
                 Task Manager
               </h1>
               <span className="block text-[10px] uppercase font-bold tracking-widest text-gray-400">
-                Student Suite
+                Academic Planner
               </span>
             </div>
           </div>
@@ -496,10 +496,7 @@ function App() {
                   <span className="bg-blue-50 text-blue-600 border border-blue-200 px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider">Student View</span>
                 )}
               </div>
-              <div className="flex items-center gap-1 mt-1 text-[9px] text-emerald-600 font-bold bg-emerald-50 border border-emerald-200 rounded px-1.5 py-0.5 w-max">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                {student.attendance || 0}% Attendance
-              </div>
+              
             </div>
           </div>
 
@@ -947,7 +944,7 @@ function App() {
               <div className="space-y-2 text-sm">
                 {tasks.filter((t) => t.type !== "assignment").length === 0 ? (
                   <div className="flex flex-col items-center justify-center text-center p-12 border border-dashed border-gray-300 rounded-xl bg-gray-50/50">
-                    <span className="text-4xl">😴</span>
+                    <span className="text-4xl"></span>
                     <h4 className="font-bold text-gray-600 text-sm mt-3">Zero General Tasks Loaded</h4>
                     <p className="text-xs text-gray-400 mt-1">Ready to chill? Write a task in the builder to begin.</p>
                   </div>
@@ -1445,7 +1442,7 @@ function App() {
                       type="email"
                       value={facEmail}
                       onChange={(e) => setFacEmail(e.target.value)}
-                      placeholder="E.g., smith@university.edu"
+                      placeholder="E.g., smith@gmail.com"
                       className="w-full bg-white border border-gray-300 rounded-xl py-2 px-3.5 text-xs text-gray-855 focus:outline-none focus:border-blue-500 transition"
                     />
                   </div>
