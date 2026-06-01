@@ -1,0 +1,17 @@
+version: "3"
+
+services:
+  backend:
+    build: ./backend
+    ports:
+      - "5002:5002"
+    environment:
+      - MONGO_URI=mongodb+srv://abhiramgundekari4_db_user:8yIjtjzSUXqBIZUj@abhiramcluster.8cgjcdw.mongodb.net/taskmanager?retryWrites=true&w=majority
+      - JWT_SECRET=abhiram_super_secret_123
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
