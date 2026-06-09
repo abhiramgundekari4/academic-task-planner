@@ -59,12 +59,7 @@ function Auth() {
       }
     } catch (err) {
       console.error(err);
-      // Local fallback
-      localStorage.setItem("token", activeRole === "admin" ? "mock-admin-token" : "mock-demo-token");
-      localStorage.setItem("userRole", activeRole);
-      localStorage.setItem("userEmail", email);
-      localStorage.setItem("userName", name || email.split("@")[0]);
-      window.location.reload();
+      alert("Registration failed. Server is currently sleeping or offline. Please wait 10 seconds and try again!");
     } finally {
       setLoading(false);
     }
@@ -113,12 +108,7 @@ function Auth() {
       }
     } catch (err) {
       console.error(err);
-      // Fallback based on selected role tab for any typed credentials when offline
-      localStorage.setItem("token", activeRole === "admin" ? "mock-admin-token" : "mock-demo-token");
-      localStorage.setItem("userRole", activeRole);
-      localStorage.setItem("userEmail", email);
-      localStorage.setItem("userName", email.split("@")[0]);
-      window.location.reload();
+      alert("Server is currently sleeping or offline. Please wait 10 seconds and try again!");
     } finally {
       setLoading(false);
     }
