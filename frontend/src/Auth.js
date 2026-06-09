@@ -94,15 +94,16 @@ function Auth() {
       const data = await res.json();
 
       if (data.token) {
-        // Always use the role returned by backend (from DB); never trust frontend-selected role
-        const confirmedRole = data.role || "student";
+        // Use the role returned by backend; fall back to the selected tab role if backend doesn't return it
+        const confirmedRole = data.role || activeRole;
         
-        if (activeRole === "admin" && confirmedRole === "student") {
+        // Only enforce mismatch if data.role was actually returned by the backend
+        if (data.role && activeRole === "admin" && data.role === "student") {
           alert("Error: This account is registered as a Student. Please use Student Login or register a new Admin account.");
           setLoading(false);
           return;
         }
-        if (activeRole === "student" && (confirmedRole === "admin" || confirmedRole === "faculty")) {
+        if (data.role && activeRole === "student" && (data.role === "admin" || data.role === "faculty")) {
           alert("Error: This account is registered as an Admin/Faculty. Please use Admin Login.");
           setLoading(false);
           return;
