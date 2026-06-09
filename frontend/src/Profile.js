@@ -4,7 +4,7 @@ import { API, getToken } from "./api";
 function Profile() {
   const token = getToken();
   const userRole = localStorage.getItem("userRole");
-  const isFaculty = userRole === "admin" || (token && (token.includes("admin") || token.includes("faculty")));
+  const isFaculty = userRole === "admin" || userRole === "faculty";
 
   // Faculty Admin Profile State
   const [adminUser, setAdminUser] = useState(() => {
