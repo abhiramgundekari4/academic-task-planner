@@ -6,7 +6,9 @@ import { API, getToken } from "./api";
 function App() {
   const token = localStorage.getItem("token");
   const userRole = localStorage.getItem("userRole");
-  const isFaculty = userRole === "admin" || (token && (token.includes("admin") || token.includes("faculty")));
+  // Only check userRole from localStorage (set by backend on login/register)
+  // Do NOT check token string contents — JWT is base64 and can contain "admin" accidentally
+  const isFaculty = userRole === "admin" || userRole === "faculty";
 
   // active tab state
   const [activeTab, setActiveTab] = useState("dashboard");

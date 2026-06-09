@@ -49,10 +49,13 @@ function Auth() {
       const data = await res.json();
 
       if (data.token) {
+        // Always use the role from the backend response; only fallback if missing
+        const confirmedRole = data.role || activeRole;
         localStorage.setItem("token", data.token);
-        localStorage.setItem("userRole", data.role || activeRole);
+        localStorage.setItem("userRole", confirmedRole);
         localStorage.setItem("userEmail", email);
         localStorage.setItem("userName", name || email.split("@")[0]);
+        console.log("Registered as role:", confirmedRole);
         window.location.reload(); // Auto-login
       } else {
         alert(data.msg || "Registration failed");
@@ -92,8 +95,10 @@ function Auth() {
       const data = await res.json();
 
       if (data.token) {
+        // Always use the role returned by backend (from DB); never trust frontend-selected role
+        const confirmedRole = data.role || "student";
         localStorage.setItem("token", data.token);
-        localStorage.setItem("userRole", data.role || activeRole);
+        localStorage.setItem("userRole", confirmedRole);
         localStorage.setItem("userEmail", email);
         if (data.name) {
           localStorage.setItem("userName", data.name);
@@ -102,6 +107,7 @@ function Auth() {
         } else {
           localStorage.setItem("userName", email.split("@")[0]);
         }
+        console.log("Logged in as role:", confirmedRole);
         window.location.reload();
       } else {
         alert(data.msg || "Login failed. Please register first!");

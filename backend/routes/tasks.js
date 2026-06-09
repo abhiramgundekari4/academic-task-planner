@@ -29,8 +29,6 @@ router.post("/", auth, async (req, res) => {
   }
 });
 
-const User = require("../models/User");
-
 // get all task records
 router.get("/", auth, async (req, res) => {
   try {
@@ -65,6 +63,8 @@ router.delete("/:id", auth, async (req, res) => {
 });
 
 // toggle complete status or update remark
+// Any authenticated user can update any task (mark complete, add remark)
+// This allows students to interact with admin/faculty-posted tasks
 router.put("/:id", auth, async (req, res) => {
   try {
     const task = await Task.findById(req.params.id);
@@ -72,14 +72,8 @@ router.put("/:id", auth, async (req, res) => {
       return res.status(404).json({ msg: "Task not found" });
     }
 
-    const taskCreator = await User.findById(task.user);
-    const isTaskCreatorAdmin = taskCreator && taskCreator.role === "admin";
-
-    // Allow owner or any student to toggle admin-created tasks
-    if (task.user.toString() !== req.user.id && !isTaskCreatorAdmin) {
-      return res.status(401).json({ msg: "Not authorized" });
-    }
-
+    // Allow any authenticated user to toggle completion and save remarks
+    // (Students need to mark faculty/admin tasks as done and add remarks)
     if (req.body.completed !== undefined) {
       task.completed = req.body.completed;
     } else {
