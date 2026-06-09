@@ -13,7 +13,6 @@ function Auth() {
   // Switch role and clear credentials
   const handleRoleChange = (role) => {
     setActiveRole(role);
-    setIsLogin(true);
     setName("");
     setAdminKey("");
     setEmail("");
