@@ -3,6 +3,19 @@ import Auth from "./Auth";
 import Profile from "./Profile";
 import { API, getToken } from "./api";
 
+// ── One-time role cleanup (module scope, runs before component mounts) ──
+// If userRole in localStorage is corrupted/invalid, clear everything and reload
+// so the user gets a fresh login with the correct role from the backend.
+(function cleanupBadRole() {
+  const storedToken = localStorage.getItem("token");
+  const storedRole  = localStorage.getItem("userRole");
+  const VALID_ROLES = ["student", "admin", "faculty"];
+  if (storedToken && storedRole && !VALID_ROLES.includes(storedRole)) {
+    localStorage.clear();
+    window.location.reload();
+  }
+})();
+
 function App() {
   const token = localStorage.getItem("token");
   const userRole = localStorage.getItem("userRole");
