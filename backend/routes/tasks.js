@@ -35,21 +35,21 @@ const User = require("../models/User");
 router.get("/", auth, async (req, res) => {
   try {
     const currentUser = await User.findById(req.user.id);
-    let query = { user: req.user.id };
+    
+    // Classify as faculty if role is admin or if email contains admin/faculty
+    const isFacultyUser = currentUser && (
+      currentUser.role === "admin" ||
+      (currentUser.email && (currentUser.email.toLowerCase().includes("admin") || currentUser.email.toLowerCase().includes("faculty")))
+    );
 
-    // If student, also find tasks created by any admin/faculty
-    if (currentUser && currentUser.role !== "admin") {
-      const admins = await User.find({ role: "admin" }).select("_id");
-      const adminIds = admins.map(a => a._id);
-      query = {
-        $or: [
-          { user: req.user.id },
-          { user: { $in: adminIds } }
-        ]
-      };
+    let tasks;
+    if (isFacultyUser) {
+      // Faculty sees tasks they created
+      tasks = await Task.find({ user: req.user.id }).sort({ createdAt: -1 });
+    } else {
+      // Students see all tasks in the system
+      tasks = await Task.find().sort({ createdAt: -1 });
     }
-
-    const tasks = await Task.find(query).sort({ createdAt: -1 });
     res.json(tasks);
   } catch (err) {
     console.error("Error fetching tasks:", err.message);
