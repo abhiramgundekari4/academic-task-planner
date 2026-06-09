@@ -97,6 +97,18 @@ function Auth() {
       if (data.token) {
         // Always use the role returned by backend (from DB); never trust frontend-selected role
         const confirmedRole = data.role || "student";
+        
+        if (activeRole === "admin" && confirmedRole === "student") {
+          alert("Error: This account is registered as a Student. Please use Student Login or register a new Admin account.");
+          setLoading(false);
+          return;
+        }
+        if (activeRole === "student" && (confirmedRole === "admin" || confirmedRole === "faculty")) {
+          alert("Error: This account is registered as an Admin/Faculty. Please use Admin Login.");
+          setLoading(false);
+          return;
+        }
+
         localStorage.setItem("token", data.token);
         localStorage.setItem("userRole", confirmedRole);
         localStorage.setItem("userEmail", email);
