@@ -29,6 +29,10 @@ const TaskSchema = new mongoose.Schema({
   assignedFaculty: {
     type: String,
     default: ""
+  },
+  remark: {
+    type: String,
+    default: ""
   }
 }, { timestamps: true });
 

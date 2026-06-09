@@ -343,6 +343,41 @@ function App() {
     }
   };
 
+  // save/update task remark
+  const handleSaveRemark = async (id, remarkText) => {
+    if (token.startsWith("mock-")) {
+      const updated = tasks.map((t) =>
+        t._id === id ? { ...t, remark: remarkText } : t
+      );
+      setTasks(updated);
+      localStorage.setItem("smart_task_manager_local_tasks", JSON.stringify(updated));
+      alert("Remark updated locally!");
+      return;
+    }
+
+    try {
+      const currentTask = tasks.find(t => t._id === id);
+      const res = await fetch(`${API}/api/tasks/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + getToken(),
+        },
+        body: JSON.stringify({
+          remark: remarkText,
+          completed: currentTask ? currentTask.completed : false
+        })
+      });
+      const data = await res.json();
+      if (data && data._id) {
+        setTasks(tasks.map((t) => (t._id === id ? data : t)));
+        alert("Remark updated successfully!");
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   // save new faculty member
   const handleAddFaculty = async (e) => {
     e.preventDefault();
@@ -978,55 +1013,79 @@ function App() {
                       .map((item) => (
                         <div
                           key={item._id}
-                          className="bg-white border border-gray-250 p-4 rounded-xl flex items-center justify-between gap-4 transition hover:border-blue-300 shadow-sm"
+                          className="bg-white border border-gray-250 p-4 rounded-xl flex flex-col gap-3 transition hover:border-blue-305 shadow-sm"
                         >
-                          <div className="flex items-center gap-3.5 overflow-hidden">
-                            <input
-                              type="checkbox"
-                              checked={item.completed}
-                              disabled={isFaculty}
-                              onChange={() => !isFaculty && handleToggleTask(item._id)}
-                              className={`w-5 h-5 rounded border-gray-350 bg-white text-blue-500 focus:ring-0 focus:outline-none transition shrink-0 ${
-                                isFaculty ? "opacity-60 cursor-not-allowed" : "cursor-pointer"
-                              }`}
-                            />
-                            <div className="space-y-1.5 overflow-hidden">
-                              <p
-                                className={`text-sm font-bold text-gray-800 transition truncate ${
-                                  item.completed ? "line-through text-gray-400 font-semibold" : ""
+                          <div className="flex items-center justify-between gap-4 w-full">
+                            <div className="flex items-center gap-3.5 overflow-hidden">
+                              <input
+                                type="checkbox"
+                                checked={item.completed}
+                                disabled={isFaculty}
+                                onChange={() => !isFaculty && handleToggleTask(item._id)}
+                                className={`w-5 h-5 rounded border-gray-350 bg-white text-blue-500 focus:ring-0 focus:outline-none transition shrink-0 ${
+                                  isFaculty ? "opacity-60 cursor-not-allowed" : "cursor-pointer"
                                 }`}
-                              >
-                                {item.title}
-                              </p>
-                              <div className="flex flex-wrap items-center gap-2 text-[10px] text-gray-500 font-medium">
-                                <span
-                                  className={`px-2 py-0.5 rounded font-bold uppercase ${
-                                    item.priority === "high"
-                                      ? "bg-red-50 text-red-600"
-                                      : item.priority === "medium"
-                                      ? "bg-orange-50 text-orange-600"
-                                      : "bg-green-50 text-green-600"
+                              />
+                              <div className="space-y-1.5 overflow-hidden">
+                                <p
+                                  className={`text-sm font-bold text-gray-800 transition truncate ${
+                                    item.completed ? "line-through text-gray-400 font-semibold" : ""
                                   }`}
                                 >
-                                  {item.priority}
-                                </span>
-                                {item.assignedFaculty && (
-                                  <span className="bg-gray-50 border border-gray-250 px-2 py-0.5 rounded text-gray-600 font-bold">
-                                    Faculty: {item.assignedFaculty}
+                                  {item.title}
+                                </p>
+                                <div className="flex flex-wrap items-center gap-2 text-[10px] text-gray-500 font-medium">
+                                  <span
+                                    className={`px-2 py-0.5 rounded font-bold uppercase ${
+                                      item.priority === "high"
+                                        ? "bg-red-50 text-red-600"
+                                        : item.priority === "medium"
+                                        ? "bg-orange-50 text-orange-600"
+                                        : "bg-green-50 text-green-600"
+                                    }`}
+                                  >
+                                    {item.priority}
                                   </span>
-                                )}
-                                <span>Due: {item.dueDate ? item.dueDate.split("T")[0] : "No deadline"}</span>
+                                  {item.assignedFaculty && (
+                                    <span className="bg-gray-50 border border-gray-250 px-2 py-0.5 rounded text-gray-600 font-bold">
+                                      Faculty: {item.assignedFaculty}
+                                    </span>
+                                  )}
+                                  <span>Due: {item.dueDate ? item.dueDate.split("T")[0] : "No deadline"}</span>
+                                </div>
                               </div>
                             </div>
+                            {isFaculty && (
+                              <button
+                                onClick={() => handleDeleteTask(item._id)}
+                                className="text-xs bg-red-50 hover:bg-red-100 border border-red-200 text-red-650 px-3 py-1.5 rounded-lg font-bold transition active:scale-[0.98] cursor-pointer"
+                              >
+                                Delete
+                              </button>
+                            )}
                           </div>
-                          {isFaculty && (
-                            <button
-                              onClick={() => handleDeleteTask(item._id)}
-                              className="text-xs bg-red-50 hover:bg-red-100 border border-red-200 text-red-650 px-3 py-1.5 rounded-lg font-bold transition active:scale-[0.98] cursor-pointer"
-                            >
-                              Delete
-                            </button>
-                          )}
+
+                          {/* Remark Section */}
+                          <div className="border-t border-gray-100 pt-2 w-full text-xs">
+                            {!isFaculty ? (
+                              <div className="flex items-center gap-2">
+                                <input
+                                  type="text"
+                                  placeholder="Add remark..."
+                                  defaultValue={item.remark || ""}
+                                  onBlur={(e) => handleSaveRemark(item._id, e.target.value)}
+                                  className="flex-1 bg-gray-50 border border-gray-200 rounded-lg p-2 text-xs text-gray-800 focus:outline-none focus:border-blue-400 focus:bg-white transition"
+                                />
+                              </div>
+                            ) : (
+                              item.remark && (
+                                <div className="text-gray-500 italic bg-gray-50 p-2 rounded-lg border border-gray-200">
+                                  <span className="font-bold uppercase text-[9px] text-gray-400 not-italic block mb-0.5">Remark:</span>
+                                  "{item.remark}"
+                                </div>
+                              )
+                            )}
+                          </div>
                         </div>
                       ))
                   )}
@@ -1050,55 +1109,79 @@ function App() {
                       .map((item) => (
                         <div
                           key={item._id}
-                          className="bg-white border border-gray-250 p-4 rounded-xl flex items-center justify-between gap-4 transition hover:border-blue-300 shadow-sm"
+                          className="bg-white border border-gray-250 p-4 rounded-xl flex flex-col gap-3 transition hover:border-blue-305 shadow-sm"
                         >
-                          <div className="flex items-center gap-3.5 overflow-hidden">
-                            <input
-                              type="checkbox"
-                              checked={item.completed}
-                              disabled={isFaculty}
-                              onChange={() => !isFaculty && handleToggleTask(item._id)}
-                              className={`w-5 h-5 rounded border-gray-350 bg-white text-blue-500 focus:ring-0 focus:outline-none transition shrink-0 ${
-                                isFaculty ? "opacity-60 cursor-not-allowed" : "cursor-pointer"
-                              }`}
-                            />
-                            <div className="space-y-1.5 overflow-hidden">
-                              <p
-                                className={`text-sm font-bold text-gray-800 transition truncate ${
-                                  item.completed ? "line-through text-gray-400 font-semibold" : ""
+                          <div className="flex items-center justify-between gap-4 w-full">
+                            <div className="flex items-center gap-3.5 overflow-hidden">
+                              <input
+                                type="checkbox"
+                                checked={item.completed}
+                                disabled={isFaculty}
+                                onChange={() => !isFaculty && handleToggleTask(item._id)}
+                                className={`w-5 h-5 rounded border-gray-350 bg-white text-blue-500 focus:ring-0 focus:outline-none transition shrink-0 ${
+                                  isFaculty ? "opacity-60 cursor-not-allowed" : "cursor-pointer"
                                 }`}
-                              >
-                                {item.title}
-                              </p>
-                              <div className="flex flex-wrap items-center gap-2 text-[10px] text-gray-500 font-medium">
-                                <span
-                                  className={`px-2 py-0.5 rounded font-bold uppercase ${
-                                    item.priority === "high"
-                                      ? "bg-red-50 text-red-600"
-                                      : item.priority === "medium"
-                                      ? "bg-orange-50 text-orange-600"
-                                      : "bg-green-50 text-green-600"
+                              />
+                              <div className="space-y-1.5 overflow-hidden">
+                                <p
+                                  className={`text-sm font-bold text-gray-800 transition truncate ${
+                                    item.completed ? "line-through text-gray-400 font-semibold" : ""
                                   }`}
                                 >
-                                  {item.priority}
-                                </span>
-                                {item.assignedFaculty && (
-                                  <span className="bg-gray-50 border border-gray-250 px-2 py-0.5 rounded text-gray-600 font-bold">
-                                    Faculty: {item.assignedFaculty}
+                                  {item.title}
+                                </p>
+                                <div className="flex flex-wrap items-center gap-2 text-[10px] text-gray-500 font-medium">
+                                  <span
+                                    className={`px-2 py-0.5 rounded font-bold uppercase ${
+                                      item.priority === "high"
+                                        ? "bg-red-50 text-red-600"
+                                        : item.priority === "medium"
+                                        ? "bg-orange-50 text-orange-600"
+                                        : "bg-green-50 text-green-600"
+                                    }`}
+                                  >
+                                    {item.priority}
                                   </span>
-                                )}
-                                <span>Due: {item.dueDate ? item.dueDate.split("T")[0] : "No deadline"}</span>
+                                  {item.assignedFaculty && (
+                                    <span className="bg-gray-50 border border-gray-250 px-2 py-0.5 rounded text-gray-600 font-bold">
+                                      Faculty: {item.assignedFaculty}
+                                    </span>
+                                  )}
+                                  <span>Due: {item.dueDate ? item.dueDate.split("T")[0] : "No deadline"}</span>
+                                </div>
                               </div>
                             </div>
+                            {isFaculty && (
+                              <button
+                                onClick={() => handleDeleteTask(item._id)}
+                                className="text-xs bg-red-50 hover:bg-red-100 border border-red-200 text-red-655 px-3 py-1.5 rounded-lg font-bold transition active:scale-[0.98] cursor-pointer"
+                              >
+                                Delete
+                              </button>
+                            )}
                           </div>
-                          {isFaculty && (
-                            <button
-                              onClick={() => handleDeleteTask(item._id)}
-                              className="text-xs bg-red-50 hover:bg-red-100 border border-red-200 text-red-650 px-3 py-1.5 rounded-lg font-bold transition active:scale-[0.98] cursor-pointer"
-                            >
-                              Delete
-                            </button>
-                          )}
+
+                          {/* Remark Section */}
+                          <div className="border-t border-gray-100 pt-2 w-full text-xs">
+                            {!isFaculty ? (
+                              <div className="flex items-center gap-2">
+                                <input
+                                  type="text"
+                                  placeholder="Add remark..."
+                                  defaultValue={item.remark || ""}
+                                  onBlur={(e) => handleSaveRemark(item._id, e.target.value)}
+                                  className="flex-1 bg-gray-50 border border-gray-200 rounded-lg p-2 text-xs text-gray-800 focus:outline-none focus:border-blue-400 focus:bg-white transition"
+                                />
+                              </div>
+                            ) : (
+                              item.remark && (
+                                <div className="text-gray-500 italic bg-gray-50 p-2 rounded-lg border border-gray-200">
+                                  <span className="font-bold uppercase text-[9px] text-gray-400 not-italic block mb-0.5">Remark:</span>
+                                  "{item.remark}"
+                                </div>
+                              )
+                            )}
+                          </div>
                         </div>
                       ))
                   )}
@@ -1220,64 +1303,79 @@ function App() {
                     .map((item) => (
                       <div
                         key={item._id}
-                        className="bg-white border border-gray-200 p-4 rounded-xl flex items-center justify-between gap-4 transition hover:border-blue-300 shadow-sm"
+                        className="bg-white border border-gray-200 p-4 rounded-xl flex flex-col gap-3 transition hover:border-blue-300 shadow-sm"
                       >
-                        <div className="flex items-center gap-3.5 overflow-hidden">
-                          <input
-                            type="checkbox"
-                            checked={item.completed}
-                            disabled={isFaculty}
-                            onChange={() => !isFaculty && handleToggleTask(item._id)}
-                            className={`w-5 h-5 rounded border border-gray-300 bg-white text-blue-500 focus:ring-0 focus:outline-none transition shrink-0 ${
-                              isFaculty ? "opacity-60 cursor-not-allowed" : "cursor-pointer"
-                            }`}
-                          />
-                          <div className="space-y-1.5 overflow-hidden">
-                            <p
-                              className={`text-sm font-bold text-gray-800 transition truncate ${
-                                item.completed ? "line-through text-gray-400 font-semibold" : ""
+                        <div className="flex items-center justify-between gap-4 w-full">
+                          <div className="flex items-center gap-3.5 overflow-hidden">
+                            <input
+                              type="checkbox"
+                              checked={item.completed}
+                              disabled={isFaculty}
+                              onChange={() => !isFaculty && handleToggleTask(item._id)}
+                              className={`w-5 h-5 rounded border border-gray-300 bg-white text-blue-500 focus:ring-0 focus:outline-none transition shrink-0 ${
+                                isFaculty ? "opacity-60 cursor-not-allowed" : "cursor-pointer"
                               }`}
-                            >
-                              {item.title}
-                            </p>
-                            <div className="flex flex-wrap items-center gap-2 text-[10px] text-gray-500 font-medium">
-                              {/* Priority Badge */}
-                              <span
-                                className={`px-2 py-0.5 rounded font-bold uppercase ${
-                                  item.priority === "high"
-                                    ? "bg-red-50 text-red-600"
-                                    : item.priority === "medium"
-                                    ? "bg-orange-50 text-orange-600"
-                                    : "bg-green-50 text-green-600"
+                            />
+                            <div className="space-y-1.5 overflow-hidden">
+                              <p
+                                className={`text-sm font-bold text-gray-800 transition truncate ${
+                                  item.completed ? "line-through text-gray-400 font-semibold" : ""
                                 }`}
                               >
-                                {item.priority}
-                              </span>
-
-                              {/* Faculty Badge */}
-                              {item.assignedFaculty && (
-                                <span className="bg-gray-50 border border-gray-200 px-2 py-0.5 rounded text-blue-500 font-bold">
-                                  Faculty: {item.assignedFaculty}
+                                {item.title}
+                              </p>
+                              <div className="flex flex-wrap items-center gap-2 text-[10px] text-gray-500 font-medium">
+                                <span
+                                  className={`px-2 py-0.5 rounded font-bold uppercase ${
+                                    item.priority === "high"
+                                      ? "bg-red-50 text-red-600"
+                                      : item.priority === "medium"
+                                      ? "bg-orange-50 text-orange-600"
+                                      : "bg-green-50 text-green-600"
+                                  }`}
+                                >
+                                  {item.priority}
                                 </span>
-                              )}
-
-                              {/* Date */}
-                              <span>Deadline: {item.dueDate ? item.dueDate.split("T")[0] : "No deadline"}</span>
+                                {item.assignedFaculty && (
+                                  <span className="bg-gray-50 border border-gray-200 px-2 py-0.5 rounded text-gray-600 font-bold">
+                                    Faculty: {item.assignedFaculty}
+                                  </span>
+                                )}
+                                <span>Deadline: {item.dueDate ? item.dueDate.split("T")[0] : "No deadline"}</span>
+                              </div>
                             </div>
                           </div>
-                        </div>
-
-                        {/* Actions */}
-                        {isFaculty && (
-                          <div className="flex items-center gap-2">
+                          {isFaculty && (
                             <button
                               onClick={() => handleDeleteTask(item._id)}
                               className="text-xs bg-red-50 hover:bg-red-100 border border-red-200 text-red-600 px-3 py-1.5 rounded-lg font-bold transition active:scale-[0.98] cursor-pointer"
                             >
                               Delete
                             </button>
-                          </div>
-                        )}
+                          )}
+                        </div>
+
+                        {/* Remark Section */}
+                        <div className="border-t border-gray-100 pt-2 w-full text-xs">
+                          {!isFaculty ? (
+                            <div className="flex items-center gap-2">
+                              <input
+                                type="text"
+                                placeholder="Add remark..."
+                                defaultValue={item.remark || ""}
+                                onBlur={(e) => handleSaveRemark(item._id, e.target.value)}
+                                className="flex-1 bg-gray-50 border border-gray-200 rounded-lg p-2 text-xs text-gray-800 focus:outline-none focus:border-blue-400 focus:bg-white transition"
+                              />
+                            </div>
+                          ) : (
+                            item.remark && (
+                              <div className="text-gray-500 italic bg-gray-50 p-2 rounded-lg border border-gray-200">
+                                <span className="font-bold uppercase text-[9px] text-gray-400 not-italic block mb-0.5">Remark:</span>
+                                "{item.remark}"
+                              </div>
+                            )
+                          )}
+                        </div>
                       </div>
                     ))
                 )}

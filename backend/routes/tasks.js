@@ -78,7 +78,7 @@ router.delete("/:id", auth, async (req, res) => {
   }
 });
 
-// toggle complete status
+// toggle complete status or update remark
 router.put("/:id", auth, async (req, res) => {
   try {
     const task = await Task.findById(req.params.id);
@@ -94,7 +94,16 @@ router.put("/:id", auth, async (req, res) => {
       return res.status(401).json({ msg: "Not authorized" });
     }
 
-    task.completed = !task.completed;
+    if (req.body.completed !== undefined) {
+      task.completed = req.body.completed;
+    } else {
+      task.completed = !task.completed;
+    }
+
+    if (req.body.remark !== undefined) {
+      task.remark = req.body.remark;
+    }
+
     await task.save();
     res.json(task);
   } catch (err) {
