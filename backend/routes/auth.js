@@ -11,7 +11,7 @@ console.log("Auth routes loaded ✅");
 
 // REGISTER
 router.post("/register", async (req, res) => {
-  const { name, email, password, course, year, branch } = req.body;
+  const { name, email, password, course, year, branch, role } = req.body;
 
   // 🔥 PASSWORD RULE
   if (password.length < 6) {
@@ -30,14 +30,15 @@ router.post("/register", async (req, res) => {
     course,
     year,
     branch,
-    attendance: 0
+    attendance: 0,
+    role: role || "student"
   });
 
   await user.save();
 
   const token = jwt.sign({ user: { id: user.id } }, "secret123");
 
-  res.json({ token });
+  res.json({ token, role: user.role });
 });
 
 // 🔹 LOGIN
@@ -57,7 +58,7 @@ router.post("/login", async (req, res) => {
       { expiresIn: "1h" }
     );
 
-    res.json({ token });
+    res.json({ token, role: user.role, name: user.name });
 
   } catch (err) {
     res.status(500).send("Login error");

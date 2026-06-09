@@ -43,14 +43,14 @@ function Auth() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ name, email, password }),
+        body: JSON.stringify({ name, email, password, role: activeRole }),
       });
 
       const data = await res.json();
 
       if (data.token) {
         localStorage.setItem("token", data.token);
-        localStorage.setItem("userRole", activeRole);
+        localStorage.setItem("userRole", data.role || activeRole);
         localStorage.setItem("userEmail", email);
         localStorage.setItem("userName", name || email.split("@")[0]);
         window.location.reload(); // Auto-login
@@ -98,7 +98,7 @@ function Auth() {
 
       if (data.token) {
         localStorage.setItem("token", data.token);
-        localStorage.setItem("userRole", activeRole);
+        localStorage.setItem("userRole", data.role || activeRole);
         localStorage.setItem("userEmail", email);
         if (data.name) {
           localStorage.setItem("userName", data.name);

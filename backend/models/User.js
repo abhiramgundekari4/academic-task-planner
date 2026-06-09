@@ -11,7 +11,11 @@ const UserSchema = new mongoose.Schema({
   branch: String,
   attendance: Number,
   dept: String,
-  office: String
+  office: String,
+  role: {
+    type: String,
+    default: "student"
+  }
 });
 
 module.exports = mongoose.model("User", UserSchema);

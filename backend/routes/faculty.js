@@ -31,7 +31,7 @@ router.post("/", auth, async (req, res) => {
 // fetch all saved teachers
 router.get("/", auth, async (req, res) => {
   try {
-    const faculties = await Faculty.find({ user: req.user.id }).sort({ name: 1 });
+    const faculties = await Faculty.find().sort({ name: 1 });
     res.json(faculties);
   } catch (err) {
     console.error("Error fetching faculties:", err.message);
