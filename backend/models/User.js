@@ -9,7 +9,9 @@ const UserSchema = new mongoose.Schema({
   course: String,
   year: String,
   branch: String,
-  attendance: Number
+  attendance: Number,
+  dept: String,
+  office: String
 });
 
 module.exports = mongoose.model("User", UserSchema);

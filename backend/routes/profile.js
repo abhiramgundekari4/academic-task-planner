@@ -33,6 +33,8 @@ router.put("/", auth, async (req, res) => {
     if (req.body.year !== undefined) user.year = req.body.year;
     if (req.body.branch !== undefined) user.branch = req.body.branch;
     if (req.body.attendance !== undefined) user.attendance = Number(req.body.attendance);
+    if (req.body.dept !== undefined) user.dept = req.body.dept;
+    if (req.body.office !== undefined) user.office = req.body.office;
 
     await user.save();
     res.json(user);

@@ -432,9 +432,13 @@ function App() {
   const pendingItems = totalItems - completedItems;
   const completionRate = totalItems > 0 ? Math.round((completedItems / totalItems) * 100) : 0;
 
-  const totalTasks = tasks.filter((t) => t.type !== "assignment").length;
-  const completedTasks = tasks.filter((t) => t.type !== "assignment" && t.completed).length;
+  const totalTasks = tasks.filter((t) => t.type === "task").length;
+  const completedTasks = tasks.filter((t) => t.type === "task" && t.completed).length;
   const pendingTasks = totalTasks - completedTasks;
+
+  const totalResearch = tasks.filter((t) => t.type === "research").length;
+  const completedResearch = tasks.filter((t) => t.type === "research" && t.completed).length;
+  const pendingResearch = totalResearch - completedResearch;
 
   const totalAssignments = tasks.filter((t) => t.type === "assignment").length;
   const completedAssignments = tasks.filter((t) => t.type === "assignment" && t.completed).length;
@@ -513,17 +517,23 @@ function App() {
               <span className="md:inline">Dashboard</span>
             </button>
             <button
-              onClick={() => setActiveTab("tasks")}
+              onClick={() => {
+                setActiveTab("tasks");
+                setTaskType("task");
+              }}
               className={`flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold uppercase tracking-wider shrink-0 transition ${
                 activeTab === "tasks"
                   ? "bg-blue-50 text-blue-600 border border-blue-200"
                   : "text-gray-500 hover:text-gray-700 hover:bg-gray-100"
               }`}
             >
-              <span className="md:inline">Task Manager</span>
+              <span className="md:inline">Projects & Research</span>
             </button>
             <button
-              onClick={() => setActiveTab("assignments")}
+              onClick={() => {
+                setActiveTab("assignments");
+                setTaskType("assignment");
+              }}
               className={`flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold uppercase tracking-wider shrink-0 transition ${
                 activeTab === "assignments"
                   ? "bg-blue-50 text-blue-600 border border-blue-200"
@@ -591,7 +601,7 @@ function App() {
             {/* cards row */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 text-xs font-semibold">
               <div className="bg-white border border-gray-200 p-5 rounded-2xl flex flex-col justify-between shadow-sm hover:border-blue-300 transition">
-                <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Active Tasks</span>
+                <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Active Projects</span>
                 <div className="flex items-baseline gap-2 mt-2">
                   <span className="text-3xl font-black text-gray-800">{pendingTasks}</span>
                   <span className="text-xs text-gray-500">pending</span>
@@ -605,10 +615,24 @@ function App() {
               </div>
 
               <div className="bg-white border border-gray-200 p-5 rounded-2xl flex flex-col justify-between shadow-sm hover:border-blue-300 transition">
+                <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Research Areas</span>
+                <div className="flex items-baseline gap-2 mt-2">
+                  <span className="text-3xl font-black text-gray-800">{pendingResearch}</span>
+                  <span className="text-xs text-gray-500">active</span>
+                </div>
+                <div className="h-1 bg-gray-100 rounded-full mt-4 overflow-hidden">
+                  <div
+                    className="h-full bg-blue-500 rounded-full"
+                    style={{ width: `${totalResearch > 0 ? (completedResearch / totalResearch) * 100 : 0}%` }}
+                  ></div>
+                </div>
+              </div>
+
+              <div className="bg-white border border-gray-200 p-5 rounded-2xl flex flex-col justify-between shadow-sm hover:border-blue-300 transition">
                 <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Assignments</span>
                 <div className="flex items-baseline gap-2 mt-2">
                   <span className="text-3xl font-black text-gray-800">{pendingAssignments}</span>
-                  <span className="text-xs text-gray-500">active</span>
+                  <span className="text-xs text-gray-500">pending</span>
                 </div>
                 <div className="h-1 bg-gray-100 rounded-full mt-4 overflow-hidden">
                   <div
@@ -630,20 +654,6 @@ function App() {
                   <div
                     className="h-full bg-emerald-500 rounded-full"
                     style={{ width: `${completionRate}%` }}
-                  ></div>
-                </div>
-              </div>
-
-              <div className="bg-white border border-gray-200 p-5 rounded-2xl flex flex-col justify-between shadow-sm hover:border-blue-300 transition">
-                <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Saved Classes</span>
-                <div className="flex items-baseline gap-2 mt-2">
-                  <span className="text-3xl font-black text-blue-600">{scheduleClasses.length}</span>
-                  <span className="text-xs text-gray-500">weekly</span>
-                </div>
-                <div className="h-1 bg-gray-100 rounded-full mt-4 overflow-hidden">
-                  <div
-                    className="h-full bg-blue-500 rounded-full"
-                    style={{ width: `${Math.min(scheduleClasses.length * 15, 100)}%` }}
                   ></div>
                 </div>
               </div>
@@ -701,7 +711,7 @@ function App() {
                       <div className="w-2.5 h-2.5 rounded bg-blue-500"></div>
                       <div>
                         <span className="block text-[10px] text-gray-500 uppercase tracking-wider font-bold">
-                          Finished Tasks
+                          Finished Items
                         </span>
                         <span className="text-sm font-bold text-gray-700">{completedItems} Items</span>
                       </div>
@@ -710,7 +720,7 @@ function App() {
                       <div className="w-2.5 h-2.5 rounded bg-gray-200 border border-gray-300"></div>
                       <div>
                         <span className="block text-[10px] text-gray-500 uppercase tracking-wider font-bold">
-                          Pending Tasks
+                          Pending Items
                         </span>
                         <span className="text-sm font-bold text-gray-700">{pendingItems} Items</span>
                       </div>
@@ -728,7 +738,7 @@ function App() {
                   <div>
                     <div className="flex justify-between items-center text-xs mb-1">
                       <span className="font-semibold text-gray-600">High Priority</span>
-                      <span className="font-bold text-red-500">{highPriorityCount} Tasks</span>
+                      <span className="font-bold text-red-500">{highPriorityCount} Projects</span>
                     </div>
                     <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
                       <div
@@ -742,7 +752,7 @@ function App() {
                   <div>
                     <div className="flex justify-between items-center text-xs mb-1">
                       <span className="font-semibold text-gray-600">Medium Priority</span>
-                      <span className="font-bold text-orange-500">{medPriorityCount} Tasks</span>
+                      <span className="font-bold text-orange-500">{medPriorityCount} Projects</span>
                     </div>
                     <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
                       <div
@@ -756,7 +766,7 @@ function App() {
                   <div>
                     <div className="flex justify-between items-center text-xs mb-1">
                       <span className="font-semibold text-gray-600">Low Priority</span>
-                      <span className="font-bold text-green-500">{lowPriorityCount} Tasks</span>
+                      <span className="font-bold text-green-500">{lowPriorityCount} Projects</span>
                     </div>
                     <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
                       <div
@@ -773,14 +783,14 @@ function App() {
               <div className="bg-white border border-gray-200 p-6 rounded-2xl flex flex-col shadow-sm">
                 <div className="mb-4">
                   <h3 className="text-base font-bold text-gray-800">Upcoming Academic Deadlines</h3>
-                  <p className="text-xs text-gray-500 mt-0.5">Track assignments and tasks sorted by due dates</p>
+                  <p className="text-xs text-gray-500 mt-0.5">Track research areas and projects sorted by due dates</p>
                 </div>
 
                 <div className="flex-1 space-y-3 max-h-[360px] overflow-y-auto pr-1 scrollbar-thin">
                   {upcomingItems.length === 0 ? (
                     <div className="h-full flex flex-col items-center justify-center text-center p-8 border border-dashed border-gray-300 rounded-xl bg-gray-50/50">
                       <h4 className="font-bold text-gray-600 text-sm mt-2">Zero Deadlines Approaching</h4>
-                      <p className="text-xs text-gray-400 mt-1">Awesome! No tasks have upcoming schedules.</p>
+                      <p className="text-xs text-gray-400 mt-1">Awesome! No projects have upcoming schedules.</p>
                     </div>
                   ) : (
                     upcomingItems.map((item) => {
@@ -847,33 +857,45 @@ function App() {
           <div className="space-y-8 animate-fadeIn">
             {/* header section */}
             <div>
-              <span className="text-xs uppercase tracking-widest text-gray-500 font-bold">Academic Tasks</span>
-              <h2 className="text-3xl font-extrabold text-gray-800 mt-1">General Tasks</h2>
+              <span className="text-xs uppercase tracking-widest text-gray-500 font-bold">Academic Portal</span>
+              <h2 className="text-3xl font-extrabold text-gray-800 mt-1">Projects & Research</h2>
             </div>
 
             {/* create task form */}
             {isFaculty && (
               <div className="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm">
                 <h3 className="text-sm font-bold text-gray-700 mb-4 flex items-center gap-2">
-                  <span>➕</span> Create New Task Record
+                  Create New Project / Research Record
                 </h3>
                 
                 <form onSubmit={handleAddTask} className="grid grid-cols-1 md:grid-cols-12 gap-3.5 items-end text-sm">
                   {/* input field */}
-                  <div className="md:col-span-4">
+                  <div className="md:col-span-3">
                     <label className="block text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-1.5">
-                      Task Title
+                      Title
                     </label>
                     <input
                       required
                       value={taskTitle}
-                      onChange={(e) => {
-                        setTaskTitle(e.target.value);
-                        setTaskType("task"); // force type task under tasks manager
-                      }}
-                      placeholder="E.g., Complete Mathematics Lab Record..."
+                      onChange={(e) => setTaskTitle(e.target.value)}
+                      placeholder="E.g., Complete Project Report or AI Study..."
                       className="w-full bg-white border border-gray-300 rounded-xl py-2 px-3.5 text-xs text-gray-800 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition"
                     />
+                  </div>
+
+                  {/* Category Selection */}
+                  <div className="md:col-span-2">
+                    <label className="block text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-1.5">
+                      Category
+                    </label>
+                    <select
+                      value={taskType === "assignment" ? "task" : taskType}
+                      onChange={(e) => setTaskType(e.target.value)}
+                      className="w-full bg-white border border-gray-300 rounded-xl py-2 px-3 text-xs text-gray-655 focus:outline-none focus:border-blue-500 transition cursor-pointer"
+                    >
+                      <option value="task">Project</option>
+                      <option value="research">Research Area</option>
+                    </select>
                   </div>
 
                   {/* Priority */}
@@ -893,9 +915,9 @@ function App() {
                   </div>
 
                   {/* Faculty */}
-                  <div className="md:col-span-3">
+                  <div className="md:col-span-2">
                     <label className="block text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-1.5">
-                      Assigned Faculty (Optional)
+                      Faculty
                     </label>
                     <select
                       value={assignedFaculty}
@@ -920,7 +942,7 @@ function App() {
                       type="date"
                       value={dueDate}
                       onChange={(e) => setDueDate(e.target.value)}
-                      className="w-full bg-white border border-gray-300 rounded-xl py-2 px-3 text-xs text-gray-600 focus:outline-none focus:border-blue-500 transition cursor-pointer"
+                      className="w-full bg-white border border-gray-300 rounded-xl py-2 px-3 text-xs text-gray-605 focus:outline-none focus:border-blue-500 transition cursor-pointer"
                     />
                   </div>
 
@@ -937,81 +959,150 @@ function App() {
               </div>
             )}
 
-            {/* tasks checkboxes checklist */}
-            <div className="bg-white border border-gray-200 p-6 rounded-2xl space-y-4 shadow-sm">
-              <h3 className="text-base font-bold text-gray-800">📋 Academic Task Checklist</h3>
-              
-              <div className="space-y-2 text-sm">
-                {tasks.filter((t) => t.type !== "assignment").length === 0 ? (
-                  <div className="flex flex-col items-center justify-center text-center p-12 border border-dashed border-gray-300 rounded-xl bg-gray-50/50">
-                    <span className="text-4xl"></span>
-                    <h4 className="font-bold text-gray-600 text-sm mt-3">Zero General Tasks Loaded</h4>
-                    <p className="text-xs text-gray-400 mt-1">Ready to chill? Write a task in the builder to begin.</p>
-                  </div>
-                ) : (
-                  tasks
-                    .filter((t) => t.type !== "assignment")
-                    .map((item) => (
-                      <div
-                        key={item._id}
-                        className="bg-white border border-gray-250 p-4 rounded-xl flex items-center justify-between gap-4 transition hover:border-blue-300 shadow-sm"
-                      >
-                        <div className="flex items-center gap-3.5 overflow-hidden">
-                          <input
-                            type="checkbox"
-                            checked={item.completed}
-                            onChange={() => handleToggleTask(item._id)}
-                            className="w-5 h-5 rounded border-gray-350 bg-white text-blue-500 focus:ring-0 focus:outline-none transition cursor-pointer shrink-0"
-                          />
-                          <div className="space-y-1.5 overflow-hidden">
-                            <p
-                              className={`text-sm font-bold text-gray-800 transition truncate ${
-                                item.completed ? "line-through text-gray-400 font-semibold" : ""
+            {/* Checklists in side-by-side columns */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Left Column: Projects */}
+              <div className="bg-white border border-gray-200 p-6 rounded-2xl space-y-4 shadow-sm">
+                <h3 className="text-base font-bold text-gray-800 border-b border-gray-100 pb-2">Academic Project Checklist</h3>
+                
+                <div className="space-y-2 text-sm">
+                  {tasks.filter((t) => t.type === "task").length === 0 ? (
+                    <div className="flex flex-col items-center justify-center text-center p-12 border border-dashed border-gray-300 rounded-xl bg-gray-50/50">
+                      <span className="text-gray-400 font-medium text-xs">Folder Empty</span>
+                      <h4 className="font-bold text-gray-600 text-sm mt-3">Zero Projects Loaded</h4>
+                      <p className="text-xs text-gray-400 mt-1">No projects posted in this workspace.</p>
+                    </div>
+                  ) : (
+                    tasks
+                      .filter((t) => t.type === "task")
+                      .map((item) => (
+                        <div
+                          key={item._id}
+                          className="bg-white border border-gray-250 p-4 rounded-xl flex items-center justify-between gap-4 transition hover:border-blue-300 shadow-sm"
+                        >
+                          <div className="flex items-center gap-3.5 overflow-hidden">
+                            <input
+                              type="checkbox"
+                              checked={item.completed}
+                              disabled={isFaculty}
+                              onChange={() => !isFaculty && handleToggleTask(item._id)}
+                              className={`w-5 h-5 rounded border-gray-350 bg-white text-blue-500 focus:ring-0 focus:outline-none transition shrink-0 ${
+                                isFaculty ? "opacity-60 cursor-not-allowed" : "cursor-pointer"
                               }`}
-                            >
-                              {item.title}
-                            </p>
-                            <div className="flex flex-wrap items-center gap-2 text-[10px] text-gray-500 font-medium">
-                              {/* Priority Badge */}
-                              <span
-                                className={`px-2 py-0.5 rounded font-bold uppercase ${
-                                  item.priority === "high"
-                                    ? "bg-red-50 text-red-600"
-                                    : item.priority === "medium"
-                                    ? "bg-orange-50 text-orange-600"
-                                    : "bg-green-50 text-green-600"
+                            />
+                            <div className="space-y-1.5 overflow-hidden">
+                              <p
+                                className={`text-sm font-bold text-gray-800 transition truncate ${
+                                  item.completed ? "line-through text-gray-400 font-semibold" : ""
                                 }`}
                               >
-                                {item.priority}
-                              </span>
-
-                              {/* Faculty Badge */}
-                              {item.assignedFaculty && (
-                                <span className="bg-gray-50 border border-gray-250 px-2 py-0.5 rounded text-gray-600 font-bold">
-                                  👨‍🏫 {item.assignedFaculty}
+                                {item.title}
+                              </p>
+                              <div className="flex flex-wrap items-center gap-2 text-[10px] text-gray-500 font-medium">
+                                <span
+                                  className={`px-2 py-0.5 rounded font-bold uppercase ${
+                                    item.priority === "high"
+                                      ? "bg-red-50 text-red-600"
+                                      : item.priority === "medium"
+                                      ? "bg-orange-50 text-orange-600"
+                                      : "bg-green-50 text-green-600"
+                                  }`}
+                                >
+                                  {item.priority}
                                 </span>
-                              )}
-
-                              {/* Date */}
-                              <span>📅 {item.dueDate ? item.dueDate.split("T")[0] : "No deadline"}</span>
+                                {item.assignedFaculty && (
+                                  <span className="bg-gray-50 border border-gray-250 px-2 py-0.5 rounded text-gray-600 font-bold">
+                                    Faculty: {item.assignedFaculty}
+                                  </span>
+                                )}
+                                <span>Due: {item.dueDate ? item.dueDate.split("T")[0] : "No deadline"}</span>
+                              </div>
                             </div>
                           </div>
-                        </div>
-
-                        {/* Actions */}
-                        {isFaculty && (
-                          <div className="flex items-center gap-2">
+                          {isFaculty && (
                             <button
                               onClick={() => handleDeleteTask(item._id)}
                               className="text-xs bg-red-50 hover:bg-red-100 border border-red-200 text-red-650 px-3 py-1.5 rounded-lg font-bold transition active:scale-[0.98] cursor-pointer"
                             >
                               Delete
                             </button>
+                          )}
+                        </div>
+                      ))
+                  )}
+                </div>
+              </div>
+
+              {/* Right Column: Research Areas */}
+              <div className="bg-white border border-gray-200 p-6 rounded-2xl space-y-4 shadow-sm">
+                <h3 className="text-base font-bold text-gray-800 border-b border-gray-100 pb-2">Research Area Checklist</h3>
+                
+                <div className="space-y-2 text-sm">
+                  {tasks.filter((t) => t.type === "research").length === 0 ? (
+                    <div className="flex flex-col items-center justify-center text-center p-12 border border-dashed border-gray-300 rounded-xl bg-gray-50/50">
+                      <span className="text-gray-400 font-medium text-xs">Research Empty</span>
+                      <h4 className="font-bold text-gray-600 text-sm mt-3">Zero Research Areas</h4>
+                      <p className="text-xs text-gray-400 mt-1">No research areas posted in this workspace.</p>
+                    </div>
+                  ) : (
+                    tasks
+                      .filter((t) => t.type === "research")
+                      .map((item) => (
+                        <div
+                          key={item._id}
+                          className="bg-white border border-gray-250 p-4 rounded-xl flex items-center justify-between gap-4 transition hover:border-blue-300 shadow-sm"
+                        >
+                          <div className="flex items-center gap-3.5 overflow-hidden">
+                            <input
+                              type="checkbox"
+                              checked={item.completed}
+                              disabled={isFaculty}
+                              onChange={() => !isFaculty && handleToggleTask(item._id)}
+                              className={`w-5 h-5 rounded border-gray-350 bg-white text-blue-500 focus:ring-0 focus:outline-none transition shrink-0 ${
+                                isFaculty ? "opacity-60 cursor-not-allowed" : "cursor-pointer"
+                              }`}
+                            />
+                            <div className="space-y-1.5 overflow-hidden">
+                              <p
+                                className={`text-sm font-bold text-gray-800 transition truncate ${
+                                  item.completed ? "line-through text-gray-400 font-semibold" : ""
+                                }`}
+                              >
+                                {item.title}
+                              </p>
+                              <div className="flex flex-wrap items-center gap-2 text-[10px] text-gray-500 font-medium">
+                                <span
+                                  className={`px-2 py-0.5 rounded font-bold uppercase ${
+                                    item.priority === "high"
+                                      ? "bg-red-50 text-red-600"
+                                      : item.priority === "medium"
+                                      ? "bg-orange-50 text-orange-600"
+                                      : "bg-green-50 text-green-600"
+                                  }`}
+                                >
+                                  {item.priority}
+                                </span>
+                                {item.assignedFaculty && (
+                                  <span className="bg-gray-50 border border-gray-250 px-2 py-0.5 rounded text-gray-600 font-bold">
+                                    Faculty: {item.assignedFaculty}
+                                  </span>
+                                )}
+                                <span>Due: {item.dueDate ? item.dueDate.split("T")[0] : "No deadline"}</span>
+                              </div>
+                            </div>
                           </div>
-                        )}
-                      </div>
-                    ))
-                )}
+                          {isFaculty && (
+                            <button
+                              onClick={() => handleDeleteTask(item._id)}
+                              className="text-xs bg-red-50 hover:bg-red-100 border border-red-200 text-red-650 px-3 py-1.5 rounded-lg font-bold transition active:scale-[0.98] cursor-pointer"
+                            >
+                              Delete
+                            </button>
+                          )}
+                        </div>
+                      ))
+                  )}
+                </div>
               </div>
             </div>
           </div>
@@ -1021,7 +1112,7 @@ function App() {
           <div className="space-y-8 animate-fadeIn">
             {/* subject header */}
             <div>
-              <span className="text-xs uppercase tracking-widest text-gray-500 font-bold">Academic Syllabus</span>
+              <span className="text-xs uppercase tracking-widest text-gray-500 font-bold">Course Work</span>
               <h2 className="text-3xl font-extrabold text-gray-800 mt-1">Course Assignments</h2>
             </div>
 
@@ -1029,14 +1120,14 @@ function App() {
             {isFaculty && (
               <div className="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm">
                 <h3 className="text-sm font-bold text-gray-700 mb-4 flex items-center gap-2">
-                  File New Academic Assignment
+                  Post New Assignment
                 </h3>
                 
                 <form onSubmit={handleAddTask} className="grid grid-cols-1 md:grid-cols-12 gap-3.5 items-end text-sm">
                   {/* title field */}
                   <div className="md:col-span-4">
                     <label className="block text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-1.5">
-                      Assignment Subject / Title
+                      Assignment Title
                     </label>
                     <input
                       required
@@ -1045,7 +1136,7 @@ function App() {
                         setTaskTitle(e.target.value);
                         setTaskType("assignment"); // force type assignment under assignments manager
                       }}
-                      placeholder="E.g., Artificial Intelligence Term Sheet..."
+                      placeholder="E.g., Database Systems Homework 1..."
                       className="w-full bg-white border border-gray-300 rounded-xl py-2 px-3.5 text-xs text-gray-800 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition"
                     />
                   </div>
@@ -1106,7 +1197,7 @@ function App() {
                       type="submit"
                       className="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-xl text-xs font-bold transition active:scale-[0.98] cursor-pointer"
                     >
-                      File
+                      Post
                     </button>
                   </div>
                 </form>
@@ -1115,13 +1206,13 @@ function App() {
 
             {/* pending list */}
             <div className="bg-white border border-gray-200 p-6 rounded-2xl space-y-4 shadow-sm">
-              <h3 className="text-base font-bold text-gray-800">Pending Assignments & Term Works</h3>
+              <h3 className="text-base font-bold text-gray-800">Course Assignments Checklist</h3>
               
               <div className="space-y-2 text-sm">
                 {tasks.filter((t) => t.type === "assignment").length === 0 ? (
                   <div className="flex flex-col items-center justify-center text-center p-12 border border-dashed border-gray-300 rounded-xl bg-gray-50/50">
-                    <h4 className="font-bold text-gray-600 text-sm mt-3">No Course Assignments</h4>
-                    <p className="text-xs text-gray-400 mt-1">Excellent! All academic submissions are fully clear.</p>
+                    <h4 className="font-bold text-gray-600 text-sm mt-3">No Assignments Posted</h4>
+                    <p className="text-xs text-gray-400 mt-1">All course assignment requirements are clear.</p>
                   </div>
                 ) : (
                   tasks
@@ -1135,8 +1226,11 @@ function App() {
                           <input
                             type="checkbox"
                             checked={item.completed}
-                            onChange={() => handleToggleTask(item._id)}
-                            className="w-5 h-5 rounded border border-gray-300 bg-white text-blue-500 focus:ring-0 focus:outline-none transition cursor-pointer shrink-0"
+                            disabled={isFaculty}
+                            onChange={() => !isFaculty && handleToggleTask(item._id)}
+                            className={`w-5 h-5 rounded border border-gray-300 bg-white text-blue-500 focus:ring-0 focus:outline-none transition shrink-0 ${
+                              isFaculty ? "opacity-60 cursor-not-allowed" : "cursor-pointer"
+                            }`}
                           />
                           <div className="space-y-1.5 overflow-hidden">
                             <p
@@ -1208,7 +1302,7 @@ function App() {
                   onClick={() => setShowScheduleForm(true)}
                   className="bg-blue-500 hover:bg-blue-600 text-white font-bold text-xs uppercase tracking-wider px-5 py-2.5 rounded-xl shadow-sm cursor-pointer transition active:scale-[0.98]"
                 >
-                  ➕ Add Class
+                  Add Class
                 </button>
               )}
             </div>
@@ -1238,7 +1332,7 @@ function App() {
               <div className="lg:col-span-2 space-y-3">
                 {scheduleClasses.filter((c) => c.day === scheduleDay).length === 0 ? (
                   <div className="flex flex-col items-center justify-center text-center p-12 border border-dashed border-gray-300 rounded-xl bg-gray-50/50">
-                    <span className="text-4xl">📚</span>
+                    <span className="text-gray-400 font-medium text-xs">No Classes Scheduled</span>
                     <h4 className="font-bold text-gray-650 text-sm mt-3">No Classes Scheduled</h4>
                     <p className="text-xs text-gray-400 mt-1">No classes saved for {scheduleDay}. Click Add Class to begin.</p>
                   </div>
@@ -1253,22 +1347,21 @@ function App() {
                       >
                         <div className="space-y-2 overflow-hidden">
                           <h4 className="font-bold text-sm text-gray-800 flex items-center gap-2">
-                            <span className="text-blue-500 text-base">📘</span>
                             <span>{item.subject}</span>
                           </h4>
                           
                           <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs text-gray-500 font-medium">
                             <div className="flex items-center gap-1.5">
-                              <span className="text-gray-400">⏱️</span>
+                              <span className="text-gray-400 font-bold uppercase text-[9px] tracking-wider">Time:</span>
                               <span>{item.timeSlot}</span>
                             </div>
                             <div className="flex items-center gap-1.5 truncate">
-                              <span className="text-gray-400">🏢</span>
-                              <span>Room: {item.room}</span>
+                              <span className="text-gray-400 font-bold uppercase text-[9px] tracking-wider">Room:</span>
+                              <span>{item.room}</span>
                             </div>
                             <div className="flex items-center gap-1.5 truncate">
-                              <span className="text-gray-400">👨‍🏫</span>
-                              <span>Prof: {item.faculty}</span>
+                              <span className="text-gray-400 font-bold uppercase text-[9px] tracking-wider">Faculty:</span>
+                              <span>{item.faculty}</span>
                             </div>
                           </div>
                         </div>
@@ -1279,7 +1372,7 @@ function App() {
                             className="p-1.5 rounded-lg border border-gray-250 hover:bg-red-50 text-gray-400 hover:text-red-500 transition shrink-0"
                             title="Remove Class"
                           >
-                            🗑️
+                            Delete
                           </button>
                         )}
                       </div>
