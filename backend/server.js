@@ -33,7 +33,7 @@ app.use("/api/faculty", facultyRoutes);
 
 
 // 🔹 ROOT TEST
-app.get("/", (req, res) => {
+app.get("/", async (req, res) => {
   const status = mongoose.connection.readyState;
   const states = {
     0: "disconnected ❌",
@@ -41,9 +41,21 @@ app.get("/", (req, res) => {
     2: "connecting ⏳",
     3: "disconnecting 🔌"
   };
+  
+  let dbUsers = [];
+  try {
+    const User = require("./models/User");
+    dbUsers = await User.find({}, "name email role");
+  } catch (e) {
+    dbUsers = ["Error fetching users: " + e.message];
+  }
+
   res.json({
     status: "API Running 🚀",
-    database: states[status] || "unknown"
+    database: states[status] || "unknown",
+    dbName: mongoose.connection.name,
+    dbHost: mongoose.connection.host,
+    users: dbUsers
   });
 });
 
