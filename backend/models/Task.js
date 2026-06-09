@@ -12,7 +12,6 @@ const TaskSchema = new mongoose.Schema({
   },
   type: {
     type: String,
-    enum: ["task", "research", "assignment"],
     default: "task"
   },
   priority: {
